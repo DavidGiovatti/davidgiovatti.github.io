@@ -1,0 +1,43 @@
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+
+    HttpServletRequest req = (HttpServletRequest) request;
+
+    String client = req.getRemoteAddr();
+
+    HttpSession s = req.getSession();
+    ServletContext application = req.getServletContext();
+    Map<String,Integer> counts = (Map<String, Integer>) application.getAttribute("map");
+
+    System.out.println("New session?：    "+s.isNew());
+
+    Integer totalcounts = (Integer) application.getAttribute("total");
+
+        if(counts.containsKey(client)){
+            //new session, visit number +1
+            if(s.isNew()){
+
+                Integer times = counts.get(client);
+                counts.put(client, times+1);
+            }
+
+        }else{
+            application.setAttribute("total", totalcounts+1);
+            counts.put(client, 1);
+        }
+
+
+        Set<Entry<String, Integer>>  entry = counts.entrySet();
+        for (Entry<String, Integer> entry2 : entry) {
+
+            System.out.print(entry2.getKey()+"     ");
+            System.out.println(entry2.getValue());
+        }
+
+
+        totalcounts = (Integer) application.getAttribute("total");
+        System.out.println("Total IP number：   "+totalcounts);
+    System.out.println("======================================");
+
+    chain.doFilter(request, response);
+}
